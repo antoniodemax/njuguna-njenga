@@ -23,6 +23,7 @@ export function About() {
               width={520}
               height={650}
               loading="lazy"
+              decoding="async"
               className="aspect-[4/5] w-full border border-ink object-cover brightness-110 grayscale"
             />
             <figcaption className="mt-2">

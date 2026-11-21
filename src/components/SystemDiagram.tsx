@@ -1,6 +1,7 @@
 import { Bot, Database, Users } from 'lucide-react'
-import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
-import { useId, useMemo, useState } from 'react'
+import { AnimatePresence, useReducedMotion } from 'motion/react'
+import * as m from 'motion/react-m'
+import { useId, useMemo, useState, type CSSProperties } from 'react'
 import type { DiagramState, NodeKind, System, SystemNode } from '../content/systems'
 import { useElementWidth } from '../hooks/useElementWidth'
 
@@ -165,7 +166,19 @@ export function SystemDiagram({ system, drawOnLoad = false, headingLevel = 'h3' 
         )}
       </figcaption>
 
-      <div ref={ref} className="drawing-grid relative border border-rule" style={{ height }}>
+      <div
+        ref={ref}
+        // Before the width is measured (including in the prerendered HTML) the height comes from
+        // CSS, picking the sideways layout on narrow screens, so nothing jumps once it is known.
+        className="drawing-grid relative h-(--h-tall) border border-rule min-[618px]:h-(--h-wide)"
+        style={
+          {
+            '--h-tall': `${system.cols * (44 + NODE_HEIGHT)}px`,
+            '--h-wide': `${system.rows * (40 + NODE_HEIGHT)}px`,
+            ...(width > 0 ? { height } : {}),
+          } as CSSProperties
+        }
+      >
         {width > 0 && (
           <>
             <svg
@@ -198,7 +211,7 @@ export function SystemDiagram({ system, drawOnLoad = false, headingLevel = 'h3' 
                   if (!from || !to) return null
                   const step = edge.state === 'after' ? (depth.get(edge.from) ?? 0) : 0
                   return (
-                    <motion.path
+                    <m.path
                       key={`${edge.state}-${edge.from}-${edge.to}-${tall}`}
                       d={connector(place(from), place(to), nodeWidth, nodeHeight, tall)}
                       fill="none"
@@ -223,7 +236,7 @@ export function SystemDiagram({ system, drawOnLoad = false, headingLevel = 'h3' 
                 // A built part is inked in just as its connector arrives.
                 const arrives = lead + (depth.get(node.id) ?? 0) * STAGE - 0.14
                 return (
-                  <motion.button
+                  <m.button
                     key={node.id}
                     type="button"
                     aria-pressed={isSelected}
@@ -247,7 +260,7 @@ export function SystemDiagram({ system, drawOnLoad = false, headingLevel = 'h3' 
                   >
                     {built && (
                       // Wet-ink flash as the part is drawn, fading to the sheet.
-                      <motion.span
+                      <m.span
                         aria-hidden="true"
                         className="pointer-events-none absolute inset-0 bg-approved"
                         initial={{ opacity: 0.5 }}
@@ -262,7 +275,7 @@ export function SystemDiagram({ system, drawOnLoad = false, headingLevel = 'h3' 
                         viewBox="0 0 100 100"
                         preserveAspectRatio="none"
                       >
-                        <motion.line
+                        <m.line
                           x1="0"
                           y1="100"
                           x2="100"
@@ -283,7 +296,7 @@ export function SystemDiagram({ system, drawOnLoad = false, headingLevel = 'h3' 
                       <Icon size={15} strokeWidth={1.75} aria-hidden="true" className="relative shrink-0" />
                     )}
                     <span className="relative">{node.label}</span>
-                  </motion.button>
+                  </m.button>
                 )
               })}
             </AnimatePresence>

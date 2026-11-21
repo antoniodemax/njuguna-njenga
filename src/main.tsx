@@ -1,14 +1,20 @@
 import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import '@fontsource/barlow/400.css'
-import '@fontsource/barlow/600.css'
-import '@fontsource/barlow-condensed/600.css'
-import '@fontsource/barlow-condensed/700.css'
+import { createRoot, hydrateRoot } from 'react-dom/client'
+// Latin subsets only: the site is in English, so the other scripts are never needed.
+import '@fontsource/barlow/latin-400.css'
+import '@fontsource/barlow/latin-600.css'
+import '@fontsource/barlow-condensed/latin-600.css'
+import '@fontsource/barlow-condensed/latin-700.css'
 import './index.css'
 import App from './App.tsx'
 
-createRoot(document.getElementById('root')!).render(
+const root = document.getElementById('root')!
+const app = (
   <StrictMode>
     <App />
-  </StrictMode>,
+  </StrictMode>
 )
+
+// The production build ships prerendered HTML, which React takes over; in dev the root is empty.
+if (root.hasChildNodes()) hydrateRoot(root, app)
+else createRoot(root).render(app)
