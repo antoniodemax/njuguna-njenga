@@ -2,9 +2,9 @@ import { About } from './components/About'
 import { Hero } from './components/Hero'
 import { RecordTable } from './components/RecordTable'
 import { SheetHeader } from './components/SheetHeader'
-import { SideBuilds } from './components/SideBuilds'
 import { Certifications, SkillsLegend } from './components/SkillsLegend'
-import { Systems } from './components/Systems'
+import { Architecture } from './components/Architecture'
+import { Projects } from './components/Projects'
 import { TitleBlock } from './components/TitleBlock'
 
 function App() {
@@ -16,8 +16,8 @@ function App() {
         <main>
           <Hero />
           <About />
-          <Systems />
-          <SideBuilds />
+          <Projects />
+          <Architecture />
           <RecordTable />
           <SkillsLegend />
           <Certifications />

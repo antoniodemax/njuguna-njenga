@@ -126,3 +126,13 @@ All copy lives in typed files so Njuguna's corrections are one-file edits:
 ## Needed from Njuguna (does not block the build)
 - A read of the diagram notes for the three systems: they are drafted from the CV only.
 - Whether the downloadable CV should include his phone number.
+
+## Refinement, November 2026
+
+- Headline is now "I design AI systems that replace the workarounds.", set about 13% smaller.
+- Navigation: About, Projects, Architecture, Experience, Contact. Below 768px the links sit behind a menu button.
+- **Projects**: the three client systems as case studies (problem, system designed, architecture and decisions, outcome, status), then the four side builds with a status label each. Filled green marker = shipped work; outlined = prototype or demo.
+- **Architecture**: the Rova and M365 diagrams plus a grid of eight technical decisions, one CV-backed example per area.
+- **Experience** replaces the "Record" label. Skills and Certifications follow it.
+- WFP diagram's built parts are labelled Unified platform, Shared data source and Automated workflows; the panel under each diagram now describes the Before or After state.
+- Light and blueprint-dark themes both stay.

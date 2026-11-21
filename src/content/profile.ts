@@ -2,7 +2,7 @@ export const profile = {
   name: 'Njuguna Njenga',
   role: 'Senior AI engineer and technical architect',
   location: 'Nairobi, Kenya',
-  statement: 'I design AI systems that replace the ones people work around.',
+  statement: 'I design AI systems that replace the workarounds.',
   intro:
     'Senior AI engineer and technical architect in Nairobi. Right now I am an AWS ProServe consultant on supply-chain systems for the UN World Food Programme.',
   email: 'simonnjenganjuguna@gmail.com',

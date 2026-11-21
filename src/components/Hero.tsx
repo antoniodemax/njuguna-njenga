@@ -12,14 +12,14 @@ export function Hero() {
       <div className="xl:col-span-5">
         <h1
           id="statement"
-          className="font-display text-[clamp(2.75rem,6.4vw,4.75rem)] font-bold leading-[0.95] tracking-[-0.01em]"
+          className="font-display text-[clamp(2.4rem,5.5vw,4.1rem)] font-bold leading-[0.95] tracking-[-0.01em]"
         >
           {profile.statement}
         </h1>
         <p className="mt-6 max-w-[44ch] text-lg">{profile.intro}</p>
         <div className="mt-8 flex flex-wrap gap-3">
           <a
-            href="#systems"
+            href="#projects"
             className="rounded-[2px] border border-ink bg-ink px-5 py-2.5 font-display text-lg font-semibold text-sheet transition-opacity duration-200 hover:opacity-85"
           >
             See the systems

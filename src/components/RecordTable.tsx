@@ -3,7 +3,7 @@ import { Section } from './Section'
 
 export function RecordTable() {
   return (
-    <Section id="record" title="Record" aside="Where I have worked and what changed while I was there, newest first.">
+    <Section id="experience" title="Experience" aside="Where I have worked and what changed while I was there, newest first.">
       <table className="w-full border-collapse text-left">
         <thead className="max-md:sr-only">
           <tr className="border-b border-ink font-display text-lg">

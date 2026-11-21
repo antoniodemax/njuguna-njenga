@@ -23,6 +23,8 @@ export interface System {
   client: string
   period: string
   summary: string
+  /** What the picture looked like before the work. Shown in the Before state. */
+  before?: string
   cols: number
   rows: number
   nodes: SystemNode[]
@@ -37,7 +39,9 @@ export const wfp: System = {
   client: 'SupplyChainWise with AWS Professional Services, for the UN World Food Programme',
   period: '2026 to present',
   summary:
-    'One Next.js platform in place of the spreadsheets, email chains and legacy systems that humanitarian supply-chain teams used to stitch together by hand. Workflows improved by 80 to 85% across WFP teams. Select a part of the drawing to see what it did.',
+    'One unified platform replaces all three. Teams work from a single shared data source, with agent workflows built on a standard starter kit. Workflows improved by 80 to 85% across WFP teams. Select any part of the drawing to read more.',
+  before:
+    'WFP teams worked across three disconnected places: Excel workbooks, repetitive email chains and fragmented legacy systems. The back-and-forth between them led to data errors.',
   cols: 4,
   rows: 3,
   nodes: [
@@ -75,7 +79,7 @@ export const wfp: System = {
     },
     {
       id: 'platform',
-      label: 'Next.js platform',
+      label: 'Unified platform',
       kind: 'built',
       col: 2,
       row: 1,
@@ -83,7 +87,7 @@ export const wfp: System = {
     },
     {
       id: 'data',
-      label: 'One data source',
+      label: 'Shared data source',
       kind: 'data',
       col: 3,
       row: 0,
@@ -91,11 +95,11 @@ export const wfp: System = {
     },
     {
       id: 'agents',
-      label: 'Agent starter kit',
+      label: 'Automated workflows',
       kind: 'agent',
       col: 3,
       row: 2,
-      note: 'An agentic AI starter kit that standardises how the team builds and ships agent workflows.',
+      note: 'Agent workflows, built on an agentic AI starter kit that standardises how the team builds and ships them.',
     },
   ],
   edges: [
@@ -115,6 +119,7 @@ export const rova: System = {
   period: 'April to August 2026',
   summary:
     'Led the architecture of enterprise-scale mobile-lending applications and the move from a legacy monolith to microservices, improving modularity, latency and scalability. Defended the system designs, data models and infrastructure choices live with executive client teams.',
+  before: 'The mobile-lending applications ran on a single legacy monolith.',
   cols: 3,
   rows: 1,
   nodes: [

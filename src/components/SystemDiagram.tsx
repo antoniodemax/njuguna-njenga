@@ -109,12 +109,14 @@ export function SystemDiagram({ system, drawOnLoad = false, headingLevel = 'h3' 
     if (next === state) return
     setState(next)
     setHasSwitched(true)
+    // Clear the selection so the panel explains the state just switched to.
+    setSelectedId(null)
   }
 
   const status = selected ? describeNode(selected, state) : null
 
   return (
-    <figure className="m-0">
+    <figure id={`system-${system.id}`} className="m-0">
       <figcaption className="flex flex-wrap items-end justify-between gap-x-6 gap-y-3 pb-4">
         <div className="max-w-[60ch]">
           <Heading className="font-display text-2xl font-semibold leading-tight">{system.title}</Heading>
@@ -219,7 +221,7 @@ export function SystemDiagram({ system, drawOnLoad = false, headingLevel = 'h3' 
 
       <div className="border-x border-b border-rule px-4 py-3 sm:min-h-[7.5rem]" aria-live="polite">
         <p className="font-display text-lg font-semibold leading-snug">
-          {selected ? selected.label : 'About this system'}
+          {selected ? selected.label : !hasBefore ? 'About this system' : state === 'before' ? 'Before' : 'After'}
           {status && (
             <span
               className={`ml-2 text-base font-semibold ${
@@ -230,7 +232,7 @@ export function SystemDiagram({ system, drawOnLoad = false, headingLevel = 'h3' 
             </span>
           )}
         </p>
-        <p className="max-w-[68ch] text-[0.975rem]">{selected ? selected.note : system.summary}</p>
+        <p className="max-w-[68ch] text-[0.975rem]">{selected ? selected.note : state === 'before' && system.before ? system.before : system.summary}</p>
       </div>
     </figure>
   )
