@@ -74,6 +74,7 @@ Shape: 1px linework, square corners on the sheet and diagrams, 2px radius only o
 ```
 
 - **Hero**: statement on the left, the WFP diagram on the right. On load the linework draws itself once (the only non-triggered motion on the page).
+- **About**: directly under the hero. Three short first-person paragraphs from the CV and a three-row facts list (based in, now, focus). An optional 4:5 portrait sits to the left: drop `njuguna-njenga.jpg` into `src/assets/` and it appears; without it the section is text only.
 - **Diagrams**: each has a Before/After switch. Before shows the legacy pieces in redline; After shows what replaced them in ink/approved, with lines redrawing between states. Hovering, focusing or tapping a node shows its note (what it was, what replaced it, the result) in an annotation beside the drawing. Nodes are real buttons, so the whole thing works by keyboard. On phones the diagram stacks vertically and notes open below it.
 - **Record**: the career history as a drawing revision table (newest first), with dates exactly as in the CV.
 - **Skills**: a legend, grouped as in the CV. No progress bars or percentages.

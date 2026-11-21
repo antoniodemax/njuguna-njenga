@@ -87,10 +87,12 @@ export function SystemDiagram({ system, drawOnLoad = false, headingLevel = 'h3' 
   const tall = width > 0 && width < 560
   const cols = tall ? system.rows : system.cols
   const rows = tall ? system.cols : system.rows
-  const cellHeight = tall ? 96 : 92
-  const height = rows * cellHeight
   const cellWidth = width / cols
   const nodeWidth = Math.max(0, Math.min(176, cellWidth - (tall ? 12 : 28)))
+  // Very narrow boxes wrap their label onto three lines, so they get more height.
+  const nodeHeight = nodeWidth < 84 ? 68 : NODE_HEIGHT
+  const cellHeight = (tall ? 44 : 40) + nodeHeight
+  const height = rows * cellHeight
 
   const place = (node: SystemNode): Point => ({
     x: ((tall ? node.row : node.col) + 0.5) * cellWidth,
@@ -128,7 +130,7 @@ export function SystemDiagram({ system, drawOnLoad = false, headingLevel = 'h3' 
                 type="button"
                 aria-pressed={state === option}
                 onClick={() => switchTo(option)}
-                className={`cursor-pointer px-4 py-1.5 font-display text-base font-semibold transition-colors duration-200 ${
+                className={`min-h-11 cursor-pointer px-5 font-display text-base font-semibold transition-colors duration-200 ${
                   state === option ? 'bg-ink text-sheet' : 'bg-transparent text-ink hover:bg-ink/10'
                 }`}
               >
@@ -169,7 +171,7 @@ export function SystemDiagram({ system, drawOnLoad = false, headingLevel = 'h3' 
                 return (
                   <motion.path
                     key={`${state}-${edge.from}-${edge.to}-${tall}`}
-                    d={connector(place(from), place(to), nodeWidth, NODE_HEIGHT, tall)}
+                    d={connector(place(from), place(to), nodeWidth, nodeHeight, tall)}
                     fill="none"
                     stroke={lineColor}
                     strokeWidth={1.5}
@@ -201,9 +203,9 @@ export function SystemDiagram({ system, drawOnLoad = false, headingLevel = 'h3' 
                   className={nodeClasses(node, state, isSelected)}
                   style={{
                     left: x - nodeWidth / 2,
-                    top: y - NODE_HEIGHT / 2,
+                    top: y - nodeHeight / 2,
                     width: nodeWidth,
-                    height: NODE_HEIGHT,
+                    height: nodeHeight,
                   }}
                 >
                   {Icon && nodeWidth > 120 && <Icon size={15} strokeWidth={1.75} aria-hidden="true" className="shrink-0" />}

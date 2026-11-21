@@ -1,3 +1,4 @@
+import { About } from './components/About'
 import { Hero } from './components/Hero'
 import { RecordTable } from './components/RecordTable'
 import { SheetHeader } from './components/SheetHeader'
@@ -14,6 +15,7 @@ function App() {
         <SheetHeader />
         <main>
           <Hero />
+          <About />
           <Systems />
           <SideBuilds />
           <RecordTable />

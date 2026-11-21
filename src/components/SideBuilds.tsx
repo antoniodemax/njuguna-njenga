@@ -1,7 +1,7 @@
 import { sideBuilds } from '../content/projects'
 import { Section } from './Section'
 
-const linkClass = 'font-semibold underline underline-offset-4 decoration-1 hover:decoration-2'
+const linkClass = 'inline-flex min-h-11 items-center font-semibold underline underline-offset-4 decoration-1 hover:decoration-2'
 
 export function SideBuilds() {
   return (
@@ -12,7 +12,7 @@ export function SideBuilds() {
             <h3 className="font-display text-2xl font-semibold leading-tight">{build.name}</h3>
             <p className="mt-1 max-w-[46ch]">{build.line}</p>
             {build.stack && <p className="mt-2 text-[0.95rem] text-pencil">{build.stack}</p>}
-            <p className="mt-4 flex flex-wrap gap-x-5 gap-y-1">
+            <p className="mt-2 flex flex-wrap gap-x-6">
               <a href={build.demo} target="_blank" rel="noreferrer" className={linkClass}>
                 Open the live demo<span className="sr-only"> of {build.name}</span>
               </a>

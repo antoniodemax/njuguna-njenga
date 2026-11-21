@@ -1,10 +1,10 @@
 import { profile } from '../content/profile'
 import { Logo } from './Logo'
 
-const cell = 'border-b border-r border-rule px-5 py-4 sm:px-6'
+const cell = 'border-b border-r border-rule px-5 py-3 sm:px-6'
 const label = 'block text-[0.9rem] text-pencil'
 const value = 'block font-display text-xl font-semibold leading-tight'
-const link = `${value} underline underline-offset-4 decoration-1 hover:decoration-2 break-words`
+const link = `${value} flex min-h-11 items-center underline underline-offset-4 decoration-1 hover:decoration-2 [overflow-wrap:anywhere]`
 
 /** The drawing's title block doubles as the contact section. */
 export function TitleBlock() {
