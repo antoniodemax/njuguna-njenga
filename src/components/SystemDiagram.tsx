@@ -1,12 +1,12 @@
 import { Bot, Database, Users } from 'lucide-react'
-import { motion, useReducedMotion } from 'motion/react'
-import { useId, useState } from 'react'
+import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
+import { useId, useMemo, useState } from 'react'
 import type { DiagramState, NodeKind, System, SystemNode } from '../content/systems'
 import { useElementWidth } from '../hooks/useElementWidth'
 
 interface Props {
   system: System
-  /** Draw the linework in once when the page loads. Used by the hero only. */
+  /** Play the build sequence once when the page loads. Used by the hero only. */
   drawOnLoad?: boolean
   headingLevel?: 'h2' | 'h3'
 }
@@ -18,12 +18,17 @@ interface Point {
 
 const NODE_HEIGHT = 52
 const ARROW_GAP = 3
+/** Seconds each step of the build takes: one connector, then the part it leads to. */
+const STAGE = 0.42
+const EASE = [0.22, 0.7, 0.2, 1] as const
 
 const icons: Partial<Record<NodeKind, typeof Bot>> = {
   people: Users,
   data: Database,
   agent: Bot,
 }
+
+const isBuilt = (node: SystemNode) => node.kind !== 'legacy' && node.kind !== 'people'
 
 /** Right-angled connector from the edge of box a to the edge of box b. */
 function connector(a: Point, b: Point, w: number, h: number, tall: boolean) {
@@ -49,28 +54,35 @@ function connector(a: Point, b: Point, w: number, h: number, tall: boolean) {
   return `M ${sx} ${a.y} H ${mx} V ${b.y} H ${ex}`
 }
 
+/** How many connectors away each part is from where the finished flow starts. */
+function buildOrder(system: System) {
+  const depth = new Map(system.nodes.map((n) => [n.id, 0]))
+  const after = system.edges.filter((e) => e.state === 'after')
+  for (let pass = 0; pass < system.nodes.length; pass++) {
+    for (const edge of after) {
+      const next = (depth.get(edge.from) ?? 0) + 1
+      if (next > (depth.get(edge.to) ?? 0)) depth.set(edge.to, next)
+    }
+  }
+  return depth
+}
+
 function nodeClasses(node: SystemNode, state: DiagramState, selected: boolean) {
   const base =
     'absolute flex items-center justify-center gap-1.5 border px-2 text-center font-display text-[0.95rem] font-semibold leading-[1.1] transition-colors duration-200 cursor-pointer'
 
   if (selected) return `${base} border-ink bg-ink text-sheet`
-
   if (node.kind === 'legacy') {
-    return state === 'after'
-      ? `${base} border-dashed border-redline bg-sheet text-redline line-through decoration-1`
-      : `${base} border-redline bg-sheet text-redline`
+    return `${base} bg-sheet text-redline ${state === 'after' ? 'border-dashed border-redline' : 'border-redline'}`
   }
   if (node.kind === 'people') return `${base} border-ink bg-sheet text-ink`
-  // Built parts are only pencilled in until the "after" state.
-  return state === 'before'
-    ? `${base} border-dashed border-rule bg-sheet text-pencil`
-    : `${base} border-approved bg-sheet text-ink`
+  return `${base} border-approved bg-sheet text-ink`
 }
 
 function describeNode(node: SystemNode, state: DiagramState) {
   if (node.kind === 'legacy') return state === 'after' ? 'Replaced' : 'In use'
   if (node.kind === 'people') return null
-  return state === 'before' ? 'Not built yet' : 'Built'
+  return 'Built'
 }
 
 export function SystemDiagram({ system, drawOnLoad = false, headingLevel = 'h3' }: Props) {
@@ -81,6 +93,7 @@ export function SystemDiagram({ system, drawOnLoad = false, headingLevel = 'h3' 
   const { ref, width } = useElementWidth<HTMLDivElement>()
   const reduceMotion = useReducedMotion()
   const markerId = useId()
+  const depth = useMemo(() => buildOrder(system), [system])
   const Heading = headingLevel
 
   // Narrow screens get the same drawing turned on its side: flow runs top to bottom.
@@ -102,8 +115,17 @@ export function SystemDiagram({ system, drawOnLoad = false, headingLevel = 'h3' 
   const byId = new Map(system.nodes.map((n) => [n.id, n]))
   const selected = selectedId ? (byId.get(selectedId) ?? null) : null
   const edges = system.edges.filter((e) => e.state === state)
-  const animate = !reduceMotion && (drawOnLoad || hasSwitched)
-  const lineColor = state === 'before' ? 'var(--redline)' : 'var(--ink)'
+  // Before the work, the built parts do not exist yet, so they are not drawn at all.
+  const nodes = system.nodes.filter((n) => state === 'after' || !isBuilt(n))
+
+  // On a switch, the old connectors retract first; on page load there is a short beat.
+  const lead = hasSwitched ? 0.3 : 0.35
+  const timing = (duration: number, delay = 0) =>
+    reduceMotion ? { duration: 0 } : { duration, delay, ease: EASE }
+  const playIntro = drawOnLoad && !reduceMotion
+  // Built parts are wiped in along the direction the flow runs.
+  const hiddenClip = tall ? 'inset(-6px -6px 100% -6px)' : 'inset(-6px 100% -6px -6px)'
+  const shownClip = 'inset(-6px -6px -6px -6px)'
 
   const switchTo = (next: DiagramState) => {
     if (next === state) return
@@ -154,67 +176,117 @@ export function SystemDiagram({ system, drawOnLoad = false, headingLevel = 'h3' 
               aria-hidden="true"
             >
               <defs>
-                <marker
-                  id={markerId}
-                  viewBox="0 0 10 10"
-                  refX="7"
-                  refY="5"
-                  markerWidth="9"
-                  markerHeight="9"
-                  orient="auto-start-reverse"
-                >
-                  <path d="M 0 1 L 10 5 L 0 9 z" fill={lineColor} />
-                </marker>
+                {(['before', 'after'] as const).map((s) => (
+                  <marker
+                    key={s}
+                    id={`${markerId}-${s}`}
+                    viewBox="0 0 10 10"
+                    refX="7"
+                    refY="5"
+                    markerWidth="9"
+                    markerHeight="9"
+                    orient="auto-start-reverse"
+                  >
+                    <path d="M 0 1 L 10 5 L 0 9 z" fill={s === 'before' ? 'var(--redline)' : 'var(--ink)'} />
+                  </marker>
+                ))}
               </defs>
-              {edges.map((edge, i) => {
-                const from = byId.get(edge.from)
-                const to = byId.get(edge.to)
-                if (!from || !to) return null
-                return (
-                  <motion.path
-                    key={`${state}-${edge.from}-${edge.to}-${tall}`}
-                    d={connector(place(from), place(to), nodeWidth, nodeHeight, tall)}
-                    fill="none"
-                    stroke={lineColor}
-                    strokeWidth={1.5}
-                    markerEnd={`url(#${markerId})`}
-                    initial={animate ? { pathLength: 0, opacity: 0 } : false}
-                    animate={{ pathLength: 1, opacity: 1 }}
-                    transition={{
-                      duration: 0.7,
-                      delay: (drawOnLoad && !hasSwitched ? 0.35 : 0) + i * 0.14,
-                      ease: 'easeOut',
-                    }}
-                  />
-                )
-              })}
+              <AnimatePresence initial={playIntro}>
+                {edges.map((edge) => {
+                  const from = byId.get(edge.from)
+                  const to = byId.get(edge.to)
+                  if (!from || !to) return null
+                  const step = edge.state === 'after' ? (depth.get(edge.from) ?? 0) : 0
+                  return (
+                    <motion.path
+                      key={`${edge.state}-${edge.from}-${edge.to}-${tall}`}
+                      d={connector(place(from), place(to), nodeWidth, nodeHeight, tall)}
+                      fill="none"
+                      stroke={edge.state === 'before' ? 'var(--redline)' : 'var(--ink)'}
+                      strokeWidth={1.5}
+                      markerEnd={`url(#${markerId}-${edge.state})`}
+                      initial={{ pathLength: 0, opacity: 0 }}
+                      animate={{ pathLength: 1, opacity: 1, transition: timing(STAGE, lead + step * STAGE) }}
+                      exit={{ pathLength: 0, opacity: 0, transition: timing(0.26) }}
+                    />
+                  )
+                })}
+              </AnimatePresence>
             </svg>
 
-            {system.nodes.map((node) => {
-              const { x, y } = place(node)
-              const Icon = icons[node.kind]
-              const isSelected = node.id === selectedId
-              return (
-                <button
-                  key={node.id}
-                  type="button"
-                  aria-pressed={isSelected}
-                  onClick={() => setSelectedId(node.id)}
-                  onMouseEnter={() => setSelectedId(node.id)}
-                  onFocus={() => setSelectedId(node.id)}
-                  className={nodeClasses(node, state, isSelected)}
-                  style={{
-                    left: x - nodeWidth / 2,
-                    top: y - nodeHeight / 2,
-                    width: nodeWidth,
-                    height: nodeHeight,
-                  }}
-                >
-                  {Icon && nodeWidth > 120 && <Icon size={15} strokeWidth={1.75} aria-hidden="true" className="shrink-0" />}
-                  <span>{node.label}</span>
-                </button>
-              )
-            })}
+            <AnimatePresence initial={playIntro}>
+              {nodes.map((node) => {
+                const { x, y } = place(node)
+                const Icon = icons[node.kind]
+                const isSelected = node.id === selectedId
+                const built = isBuilt(node)
+                // A built part is inked in just as its connector arrives.
+                const arrives = lead + (depth.get(node.id) ?? 0) * STAGE - 0.14
+                return (
+                  <motion.button
+                    key={node.id}
+                    type="button"
+                    aria-pressed={isSelected}
+                    onClick={() => setSelectedId(node.id)}
+                    onMouseEnter={() => setSelectedId(node.id)}
+                    onFocus={() => setSelectedId(node.id)}
+                    className={nodeClasses(node, state, isSelected)}
+                    style={{
+                      left: x - nodeWidth / 2,
+                      top: y - nodeHeight / 2,
+                      width: nodeWidth,
+                      height: nodeHeight,
+                    }}
+                    initial={built ? { opacity: 0, clipPath: hiddenClip } : false}
+                    animate={
+                      built
+                        ? { opacity: 1, clipPath: shownClip, transition: timing(0.5, arrives) }
+                        : { opacity: node.kind === 'legacy' && state === 'after' ? 0.72 : 1, transition: timing(0.3) }
+                    }
+                    exit={built ? { opacity: 0, clipPath: hiddenClip, transition: timing(0.24) } : undefined}
+                  >
+                    {built && (
+                      // Wet-ink flash as the part is drawn, fading to the sheet.
+                      <motion.span
+                        aria-hidden="true"
+                        className="pointer-events-none absolute inset-0 bg-approved"
+                        initial={{ opacity: 0.5 }}
+                        animate={{ opacity: 0, transition: timing(0.9, arrives + 0.25) }}
+                      />
+                    )}
+                    {node.kind === 'legacy' && (
+                      // Redline struck corner to corner across a replaced part.
+                      <svg
+                        aria-hidden="true"
+                        className="pointer-events-none absolute inset-0 size-full"
+                        viewBox="0 0 100 100"
+                        preserveAspectRatio="none"
+                      >
+                        <motion.line
+                          x1="0"
+                          y1="100"
+                          x2="100"
+                          y2="0"
+                          stroke="var(--redline)"
+                          strokeWidth={1.25}
+                          vectorEffect="non-scaling-stroke"
+                          initial={false}
+                          animate={{
+                            pathLength: state === 'after' ? 1 : 0,
+                            opacity: state === 'after' ? 1 : 0,
+                            transition: timing(0.4),
+                          }}
+                        />
+                      </svg>
+                    )}
+                    {Icon && nodeWidth > 120 && (
+                      <Icon size={15} strokeWidth={1.75} aria-hidden="true" className="relative shrink-0" />
+                    )}
+                    <span className="relative">{node.label}</span>
+                  </motion.button>
+                )
+              })}
+            </AnimatePresence>
           </>
         )}
       </div>
@@ -224,15 +296,15 @@ export function SystemDiagram({ system, drawOnLoad = false, headingLevel = 'h3' 
           {selected ? selected.label : !hasBefore ? 'About this system' : state === 'before' ? 'Before' : 'After'}
           {status && (
             <span
-              className={`ml-2 text-base font-semibold ${
-                selected?.kind === 'legacy' ? 'text-redline' : state === 'after' ? 'text-approved' : 'text-pencil'
-              }`}
+              className={`ml-2 text-base font-semibold ${selected?.kind === 'legacy' ? 'text-redline' : 'text-approved'}`}
             >
               {status}
             </span>
           )}
         </p>
-        <p className="max-w-[68ch] text-[0.975rem]">{selected ? selected.note : state === 'before' && system.before ? system.before : system.summary}</p>
+        <p className="max-w-[68ch] text-[0.975rem]">
+          {selected ? selected.note : state === 'before' && system.before ? system.before : system.summary}
+        </p>
       </div>
     </figure>
   )
