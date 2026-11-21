@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 220" role="img" aria-label="Njuguna Njenga, AI engineer and systems architect">
+  <rect width="640" height="220" fill="#070d1c"/>
+  <g transform="translate(40 40) scale(1.4)">
+    <g fill="none" stroke="#2f8bff" stroke-width="0.5" opacity="0.55">
+      <circle cx="60" cy="50" r="47" stroke-dasharray="2.5 2.5"/>
+      <path d="M0 14h120M0 86h120M12 0v100M108 0v100M60 0v100M0 50h120"/>
+      <path d="M28 0v100M92 0v100" stroke-dasharray="1.5 2.5"/>
+    </g>
+    <path d="M52 14h18l38 72H90z" fill="#2f8bff"/>
+    <path d="M12 14h16v72H12zM12 14h18l38 72H50zM52 14h16v72H52zM92 14h16v72H92z" fill="#fff"/>
+  </g>
+  <path d="M242 62v96" stroke="#2f8bff" stroke-width="2"/>
+  <g font-family="'Barlow Condensed', 'Arial Narrow', Arial, sans-serif" font-weight="700">
+    <text x="266" y="104" font-size="54" fill="#fff" letter-spacing="1">Njuguna</text>
+    <text x="266" y="150" font-size="54" fill="#2f8bff" letter-spacing="1">Njenga</text>
+  </g>
+  <text x="267" y="178" font-family="Barlow, Arial, sans-serif" font-size="15" fill="#c9d6ea">AI engineer and systems architect</text>
+</svg>
