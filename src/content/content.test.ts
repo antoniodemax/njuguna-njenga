@@ -45,6 +45,7 @@ describe('external links', () => {
   const links = [
     profile.linkedin,
     profile.github,
+    profile.whatsapp,
     ...sideBuilds.flatMap((b) => (b.repo ? [b.demo, b.repo] : [b.demo])),
   ]
 
