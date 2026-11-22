@@ -3,6 +3,7 @@ import { About } from './components/About'
 import { ClientWork } from './components/ClientWork'
 import { GitHubProfiles } from './components/GitHubProfiles'
 import { Hero } from './components/Hero'
+import { InstallBar } from './components/InstallBar'
 import { Projects } from './components/Projects'
 import { RecordTable } from './components/RecordTable'
 import { SheetHeader } from './components/SheetHeader'
@@ -26,6 +27,7 @@ function App() {
         <GitHubProfiles />
       </main>
       <TitleBlock />
+      <InstallBar />
     </LazyMotion>
   )
 }
