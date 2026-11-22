@@ -14,29 +14,36 @@ const portrait = Object.values(portraits)[0]
 
 const [firstName, lastName] = profile.name.split(' ')
 
+// Shared by the real heading and the outline drawn behind it, so the two sit exactly on top of each other.
+const nameType =
+  'font-display text-[calc(100cqw/2.94)] font-bold whitespace-nowrap leading-[0.92] tracking-[-0.01em] sm:text-[calc(100cqw/5.57)] sm:leading-none'
+
 export function Hero() {
   return (
     <section id="top" aria-labelledby="hero-name" className="relative -mt-[4.5rem] overflow-hidden px-5 pt-[4.5rem] sm:px-8">
       {/* Ember light behind the name */}
       <div aria-hidden="true" className="absolute inset-0 overflow-hidden">
-        <div className="glow left-[58%] top-[-22%] h-[105%] w-[130%] -translate-x-1/2 sm:top-[-38%] sm:h-[135%] sm:w-[105%]" />
+        <div className="glow hero-glow left-[58%] top-[-22%] h-[105%] w-[130%] -translate-x-1/2 sm:top-[-38%] sm:h-[135%] sm:w-[105%]" />
         <div className="grain" />
         <div className="absolute inset-x-0 bottom-0 h-[45%] bg-linear-to-b from-transparent to-ground" />
       </div>
 
       <div className="relative mx-auto max-w-[1200px] pb-12 pt-14 sm:pt-20 md:pb-16">
-        <p className="font-display text-2xl font-semibold sm:text-3xl">Hi, I am</p>
+        <p className="hero-hello font-display text-2xl font-semibold sm:text-3xl">Hi, I am</p>
 
         {/* The name is sized from the container so it always runs edge to edge:
             one line on wide screens, two on phones. */}
         <div className="@container relative">
-          <h1
-            id="hero-name"
-            className="font-display text-[calc(100cqw/2.94)] font-bold whitespace-nowrap leading-[0.92] tracking-[-0.01em] text-fg sm:text-[calc(100cqw/5.57)] sm:leading-none"
-          >
+          {/* Drawn first as an outline, then inked solid by the scan line (see index.css). */}
+          <div aria-hidden="true" className={`hero-outline ${nameType}`}>
+            {firstName} <br className="sm:hidden" />
+            {lastName}
+          </div>
+          <h1 id="hero-name" className={`hero-name relative text-fg ${nameType}`}>
             {firstName} <br className="sm:hidden" />
             {lastName}
           </h1>
+          <div aria-hidden="true" className="hero-scan" />
           {portrait && (
             <img
               src={portrait}

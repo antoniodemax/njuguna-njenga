@@ -164,3 +164,97 @@
     background: rgba(255, 255, 255, 0.1);
   }
 }
+
+/* Hero entrance: the name is drafted, then built.
+   1. "Hi, I am" rises in.  2. The name appears as a thin outline, like a drawing.
+   3. An ember scan line crosses it once, inking the letters solid behind it, while the
+      glow behind comes up as if the system has been switched on.
+   It plays once, takes about 1.5 seconds, and is pure CSS so it starts with the first paint.
+   Every base style below is the finished state, so reduced motion simply shows the result. */
+.hero-hello {
+  animation: hero-rise 0.4s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+.hero-name {
+  /* Negative insets keep the tails of j and g outside the clip. */
+  animation: hero-ink 0.95s cubic-bezier(0.65, 0, 0.2, 1) 0.4s both;
+}
+
+.hero-outline {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  color: transparent;
+  -webkit-text-stroke: 1.5px rgba(255, 255, 255, 0.6);
+  animation: hero-outline 1.45s ease-out both;
+}
+
+.hero-scan {
+  position: absolute;
+  top: -8%;
+  bottom: -22%;
+  left: 0;
+  width: 3px;
+  opacity: 0;
+  background: var(--ember);
+  box-shadow:
+    0 0 18px 4px rgba(255, 106, 26, 0.85),
+    0 0 60px 18px rgba(255, 106, 26, 0.35);
+  animation: hero-scan 0.95s cubic-bezier(0.65, 0, 0.2, 1) 0.4s both;
+}
+
+.hero-glow {
+  animation: hero-ignite 1.5s cubic-bezier(0.3, 0, 0.2, 1) both;
+}
+
+@keyframes hero-rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
+@keyframes hero-ink {
+  from {
+    clip-path: inset(-12% 100% -28% 0);
+  }
+  to {
+    clip-path: inset(-12% 0 -28% 0);
+  }
+}
+
+@keyframes hero-outline {
+  0% {
+    opacity: 0;
+  }
+  22%,
+  78% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes hero-scan {
+  0% {
+    opacity: 0;
+    transform: translateX(0);
+  }
+  8%,
+  88% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(100cqw);
+  }
+}
+
+/* Uses the separate scale property so it does not disturb the element's own positioning. */
+@keyframes hero-ignite {
+  from {
+    opacity: 0.22;
+    scale: 0.86;
+  }
+}

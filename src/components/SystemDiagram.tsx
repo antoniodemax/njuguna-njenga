@@ -261,7 +261,8 @@ export function SystemDiagram({ system, drawOnLoad = false, headingLevel = 'h3' 
                     onClick={() => setSelectedId(node.id)}
                     onMouseEnter={() => setSelectedId(node.id)}
                     onFocus={() => setSelectedId(node.id)}
-                    className={nodeClasses(node, state, isSelected)}
+                    // The narrowest phones get a slightly smaller label so three lines fit the box.
+                    className={`${nodeClasses(node, state, isSelected)} ${nodeWidth < 84 ? 'text-[0.8rem]!' : ''}`}
                     style={{
                       left: x - nodeWidth / 2,
                       top: y - nodeHeight / 2,

@@ -53,7 +53,7 @@ export function TitleBlock() {
                   </span>
                   <span className="min-w-0">
                     <span className="block text-[0.9rem] text-muted">{channel.label}</span>
-                    <span className="block font-display text-xl font-semibold leading-tight [overflow-wrap:anywhere]">
+                    <span className="block font-display text-[clamp(0.95rem,4.3vw,1.25rem)] font-semibold leading-tight [overflow-wrap:anywhere]">
                       {channel.value}
                     </span>
                   </span>
