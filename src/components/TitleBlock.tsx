@@ -2,6 +2,7 @@ import { FileText, Mail, Phone } from 'lucide-react'
 import type { ComponentType } from 'react'
 import { FaGithub, FaLinkedin, FaWhatsapp } from 'react-icons/fa6'
 import { profile } from '../content/profile'
+import { InstallButton } from './InstallButton'
 import { Logo } from './Logo'
 
 interface Channel {
@@ -71,6 +72,7 @@ export function TitleBlock() {
           <p>
             {profile.role}, {profile.location}
           </p>
+          <InstallButton />
         </div>
       </div>
     </footer>

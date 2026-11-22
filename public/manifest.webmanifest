@@ -1,0 +1,23 @@
+{
+  "name": "Njuguna Njenga",
+  "short_name": "Njuguna",
+  "description": "Njuguna Njenga, senior AI engineer and technical architect. Live projects, GitHub and client work.",
+  "id": "/",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0b0806",
+  "theme_color": "#0b0806",
+  "lang": "en",
+  "categories": ["portfolio", "technology"],
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "screenshots": [
+    { "src": "/screenshot-wide.webp", "sizes": "1280x720", "type": "image/webp", "form_factor": "wide", "label": "Njuguna Njenga's portfolio" },
+    { "src": "/screenshot-narrow.webp", "sizes": "390x844", "type": "image/webp", "form_factor": "narrow", "label": "Njuguna Njenga's portfolio on a phone" }
+  ]
+}

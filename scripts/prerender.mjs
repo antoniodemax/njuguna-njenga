@@ -1,5 +1,6 @@
 // Runs after the client and server builds. Writes the rendered page, structured
 // data, robots.txt and sitemap.xml into dist/.
+import { createHash } from 'node:crypto'
 import { readFile, readdir, rm, writeFile } from 'node:fs/promises'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 import path from 'node:path'
@@ -54,5 +55,22 @@ await writeFile(
 `,
 )
 
+// Service worker: save the page and everything it needs on the device.
+// Font files for scripts the site never uses and the unused stylesheet are left out.
+const publicFiles = (await readdir(dist)).filter((file) => /\.(png|svg|pdf|webmanifest)$/.test(file) && !file.startsWith('screenshot-') && file !== 'og.png')
+const assetFiles = (await readdir(path.join(dist, 'assets'))).filter((file) => !file.endsWith('.css') && !file.endsWith('.woff'))
+const precache = ['/', ...publicFiles.map((file) => `/${file}`), ...assetFiles.map((file) => `/assets/${file}`)]
+const version = createHash('sha256').update(html).update(precache.join()).digest('hex').slice(0, 12)
+const swTemplate = await readFile(path.join(root, 'scripts', 'sw-template.js'), 'utf8')
+for (const token of ["'__VERSION__'", '__PRECACHE__']) {
+  if (swTemplate.split(token).length !== 2) throw new Error(`sw-template.js must contain ${token} exactly once`)
+}
+const sw = swTemplate
+  .replace("'__VERSION__'", JSON.stringify(version))
+  .replace('__PRECACHE__', JSON.stringify(precache, null, 2))
+// A service worker with a syntax error fails silently in the browser, so check it here.
+new Function(sw)
+await writeFile(path.join(dist, 'sw.js'), sw)
+
 await rm(ssrDir, { recursive: true, force: true })
-console.log(`Prerendered ${siteUrl}/ (${(html.length / 1024).toFixed(1)} kB of HTML), wrote robots.txt and sitemap.xml`)
+console.log(`Prerendered ${siteUrl}/ (${(html.length / 1024).toFixed(1)} kB of HTML), wrote robots.txt, sitemap.xml and sw.js (${precache.length} files saved for offline use)`)

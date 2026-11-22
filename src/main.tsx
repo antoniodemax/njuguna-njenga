@@ -18,3 +18,14 @@ const app = (
 // The production build ships prerendered HTML, which React takes over; in dev the root is empty.
 if (root.hasChildNodes()) hydrateRoot(root, app)
 else createRoot(root).render(app)
+
+// Production only: save the site on the device so it opens instantly, works offline and
+// can be installed as an app. Registered after load so it never competes with the first paint.
+if (import.meta.env.PROD && 'serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').catch((error) => {
+      // The site works without it, but say so in the console rather than fail silently.
+      console.warn('Offline support could not be set up:', error)
+    })
+  })
+}
