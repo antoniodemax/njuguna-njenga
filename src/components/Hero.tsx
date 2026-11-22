@@ -32,7 +32,7 @@ export function Hero() {
         <div className="@container relative">
           <h1
             id="hero-name"
-            className="bg-linear-to-b from-white from-55% to-white/25 bg-clip-text font-display text-[calc(100cqw/2.94)] font-bold whitespace-nowrap leading-[0.84] tracking-[-0.01em] text-transparent sm:text-[calc(100cqw/5.57)] sm:leading-[0.95]"
+            className="font-display text-[calc(100cqw/2.94)] font-bold whitespace-nowrap leading-[0.92] tracking-[-0.01em] text-fg sm:text-[calc(100cqw/5.57)] sm:leading-none"
           >
             {firstName} <br className="sm:hidden" />
             {lastName}
