@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0b0806" />
     <title>Njuguna Njenga | Senior AI Engineer &amp; Technical Architect</title>
     <meta
       name="description"
@@ -35,19 +36,6 @@
       content="I design AI systems that replace the workarounds. See the systems, drawn out part by part."
     />
     <meta name="twitter:image" content="%VITE_SITE_URL%/og.png" />
-    <meta name="theme-color" content="#e4eaee" media="(prefers-color-scheme: light)" />
-    <meta name="theme-color" content="#0b2545" media="(prefers-color-scheme: dark)" />
-    <script>
-      // Set the theme before first paint: saved choice first, then the system setting.
-      (function () {
-        var saved = null
-        try {
-          saved = localStorage.getItem('theme')
-        } catch (e) {}
-        var dark = saved ? saved === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches
-        document.documentElement.dataset.theme = dark ? 'dark' : 'light'
-      })()
-    </script>
   </head>
   <body>
     <div id="root"></div>

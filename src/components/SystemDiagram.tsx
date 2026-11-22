@@ -1,13 +1,13 @@
 import { Bot, Database, Users } from 'lucide-react'
 import { AnimatePresence, useReducedMotion } from 'motion/react'
 import * as m from 'motion/react-m'
-import { useId, useMemo, useState, type CSSProperties } from 'react'
+import { useEffect, useId, useMemo, useState, type CSSProperties } from 'react'
 import type { DiagramState, NodeKind, System, SystemNode } from '../content/systems'
 import { useElementWidth } from '../hooks/useElementWidth'
 
 interface Props {
   system: System
-  /** Play the build sequence once when the page loads. Used by the hero only. */
+  /** Play the build sequence once, the first time the drawing scrolls into view. */
   drawOnLoad?: boolean
   headingLevel?: 'h2' | 'h3'
 }
@@ -70,14 +70,14 @@ function buildOrder(system: System) {
 
 function nodeClasses(node: SystemNode, state: DiagramState, selected: boolean) {
   const base =
-    'absolute flex items-center justify-center gap-1.5 border px-2 text-center font-display text-[0.95rem] font-semibold leading-[1.1] transition-colors duration-200 cursor-pointer'
+    'absolute flex items-center justify-center gap-1.5 rounded-lg border px-2 text-center font-display text-[0.95rem] font-semibold leading-[1.1] transition-colors duration-200 cursor-pointer'
 
-  if (selected) return `${base} border-ink bg-ink text-sheet`
+  if (selected) return `${base} border-fg bg-fg text-ground`
   if (node.kind === 'legacy') {
-    return `${base} bg-sheet text-redline ${state === 'after' ? 'border-dashed border-redline' : 'border-redline'}`
+    return `${base} bg-surface text-redline ${state === 'after' ? 'border-dashed border-redline' : 'border-redline'}`
   }
-  if (node.kind === 'people') return `${base} border-ink bg-sheet text-ink`
-  return `${base} border-approved bg-sheet text-ink`
+  if (node.kind === 'people') return `${base} border-fg bg-surface text-fg`
+  return `${base} border-live bg-surface text-fg`
 }
 
 function describeNode(node: SystemNode, state: DiagramState) {
@@ -93,6 +93,24 @@ export function SystemDiagram({ system, drawOnLoad = false, headingLevel = 'h3' 
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const { ref, width } = useElementWidth<HTMLDivElement>()
   const reduceMotion = useReducedMotion()
+  const [seen, setSeen] = useState(false)
+
+  // Hold the drawing back until it is on screen, so the build sequence is actually watched.
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setSeen(true)
+          observer.disconnect()
+        }
+      },
+      { threshold: 0.3 },
+    )
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [ref])
   const markerId = useId()
   const depth = useMemo(() => buildOrder(system), [system])
   const Heading = headingLevel
@@ -143,20 +161,20 @@ export function SystemDiagram({ system, drawOnLoad = false, headingLevel = 'h3' 
       <figcaption className="flex flex-wrap items-end justify-between gap-x-6 gap-y-3 pb-4">
         <div className="max-w-[60ch]">
           <Heading className="font-display text-2xl font-semibold leading-tight">{system.title}</Heading>
-          <p className="text-[0.95rem] text-pencil">
+          <p className="text-[0.95rem] text-muted">
             {system.client}, {system.period}
           </p>
         </div>
         {hasBefore && (
-          <div className="flex border border-ink" role="group" aria-label={`${system.title}: show before or after`}>
+          <div className="flex overflow-hidden rounded-full border border-line bg-white/5 p-1" role="group" aria-label={`${system.title}: show before or after`}>
             {(['before', 'after'] as const).map((option) => (
               <button
                 key={option}
                 type="button"
                 aria-pressed={state === option}
                 onClick={() => switchTo(option)}
-                className={`min-h-11 cursor-pointer px-5 font-display text-base font-semibold transition-colors duration-200 ${
-                  state === option ? 'bg-ink text-sheet' : 'bg-transparent text-ink hover:bg-ink/10'
+                className={`min-h-10 cursor-pointer rounded-full px-5 font-display text-base font-semibold transition-colors duration-200 ${
+                  state === option ? 'bg-fg text-ground' : 'bg-transparent text-fg hover:bg-white/10'
                 }`}
               >
                 {option === 'before' ? 'Before' : 'After'}
@@ -170,7 +188,7 @@ export function SystemDiagram({ system, drawOnLoad = false, headingLevel = 'h3' 
         ref={ref}
         // Before the width is measured (including in the prerendered HTML) the height comes from
         // CSS, picking the sideways layout on narrow screens, so nothing jumps once it is known.
-        className="drawing-grid relative h-(--h-tall) border border-rule min-[618px]:h-(--h-wide)"
+        className="drawing-grid relative h-(--h-tall) rounded-xl border border-line min-[618px]:h-(--h-wide)"
         style={
           {
             '--h-tall': `${system.cols * (44 + NODE_HEIGHT)}px`,
@@ -179,7 +197,7 @@ export function SystemDiagram({ system, drawOnLoad = false, headingLevel = 'h3' 
           } as CSSProperties
         }
       >
-        {width > 0 && (
+        {width > 0 && (seen || !drawOnLoad) && (
           <>
             <svg
               className="absolute inset-0"
@@ -200,7 +218,7 @@ export function SystemDiagram({ system, drawOnLoad = false, headingLevel = 'h3' 
                     markerHeight="9"
                     orient="auto-start-reverse"
                   >
-                    <path d="M 0 1 L 10 5 L 0 9 z" fill={s === 'before' ? 'var(--redline)' : 'var(--ink)'} />
+                    <path d="M 0 1 L 10 5 L 0 9 z" fill={s === 'before' ? 'var(--redline)' : 'var(--fg)'} />
                   </marker>
                 ))}
               </defs>
@@ -215,7 +233,7 @@ export function SystemDiagram({ system, drawOnLoad = false, headingLevel = 'h3' 
                       key={`${edge.state}-${edge.from}-${edge.to}-${tall}`}
                       d={connector(place(from), place(to), nodeWidth, nodeHeight, tall)}
                       fill="none"
-                      stroke={edge.state === 'before' ? 'var(--redline)' : 'var(--ink)'}
+                      stroke={edge.state === 'before' ? 'var(--redline)' : 'var(--fg)'}
                       strokeWidth={1.5}
                       markerEnd={`url(#${markerId}-${edge.state})`}
                       initial={{ pathLength: 0, opacity: 0 }}
@@ -259,10 +277,10 @@ export function SystemDiagram({ system, drawOnLoad = false, headingLevel = 'h3' 
                     exit={built ? { opacity: 0, clipPath: hiddenClip, transition: timing(0.24) } : undefined}
                   >
                     {built && (
-                      // Wet-ink flash as the part is drawn, fading to the sheet.
+                      // Wet-fg flash as the part is drawn, fading to the sheet.
                       <m.span
                         aria-hidden="true"
-                        className="pointer-events-none absolute inset-0 bg-approved"
+                        className="pointer-events-none absolute inset-0 bg-live"
                         initial={{ opacity: 0.5 }}
                         animate={{ opacity: 0, transition: timing(0.9, arrives + 0.25) }}
                       />
@@ -304,12 +322,12 @@ export function SystemDiagram({ system, drawOnLoad = false, headingLevel = 'h3' 
         )}
       </div>
 
-      <div className="border-x border-b border-rule px-4 py-3 sm:min-h-[7.5rem]" aria-live="polite">
+      <div className="px-1 pt-4 sm:min-h-[7.5rem]" aria-live="polite">
         <p className="font-display text-lg font-semibold leading-snug">
           {selected ? selected.label : !hasBefore ? 'About this system' : state === 'before' ? 'Before' : 'After'}
           {status && (
             <span
-              className={`ml-2 text-base font-semibold ${selected?.kind === 'legacy' ? 'text-redline' : 'text-approved'}`}
+              className={`ml-2 text-base font-semibold ${selected?.kind === 'legacy' ? 'text-redline' : 'text-live'}`}
             >
               {status}
             </span>

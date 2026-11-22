@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { profile } from './profile'
-import { sideBuilds } from './projects'
+import { projects } from './projects'
 import { systems } from './systems'
 
 describe('system diagrams', () => {
@@ -44,9 +44,9 @@ describe('system diagrams', () => {
 describe('external links', () => {
   const links = [
     profile.linkedin,
-    profile.github,
+    ...profile.githubProfiles.map((p) => p.url),
     profile.whatsapp,
-    ...sideBuilds.flatMap((b) => (b.repo ? [b.demo, b.repo] : [b.demo])),
+    ...projects.flatMap((p) => (p.repo ? [p.live, p.repo] : [p.live])),
   ]
 
   it('are all https', () => {

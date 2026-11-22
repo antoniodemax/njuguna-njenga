@@ -1,121 +1,88 @@
-import { ArrowUpRight, Code, Workflow } from 'lucide-react'
-import type { ReactNode } from 'react'
-import { caseStudies, sideBuilds, statusLabels, type ProjectStatus } from '../content/projects'
-import { Section } from './Section'
+import { ArrowUpRight, Code } from 'lucide-react'
+import { projects, type Project } from '../content/projects'
 
-const button =
-  'inline-flex min-h-11 items-center gap-2 rounded-[2px] border border-ink px-4 font-display text-base font-semibold whitespace-nowrap transition-colors duration-200'
-const primary = `${button} bg-ink text-sheet hover:opacity-85`
-const secondary = `${button} hover:bg-ink hover:text-sheet`
-
-/** Filled green = shipped work. Outlined = prototype or demo. The label always says which. */
-function Status({ status }: { status: ProjectStatus }) {
-  const shipped = status === 'production' || status === 'completed'
+function ProjectCard({ project }: { project: Project }) {
   return (
-    <span className="inline-flex items-center gap-2 whitespace-nowrap text-[0.95rem] font-semibold">
-      <span
-        aria-hidden="true"
-        className={`size-2.5 shrink-0 border ${shipped ? 'border-approved bg-approved' : 'border-ink'}`}
-      />
-      {statusLabels[status]}
-    </span>
+    <article>
+      <a
+        href={project.live}
+        target="_blank"
+        rel="noreferrer"
+        aria-label={`Open ${project.name} live site`}
+        className="group block overflow-hidden rounded-3xl border border-line bg-surface transition-transform duration-300 hover:-translate-y-1.5"
+      >
+        <img
+          src={project.image}
+          alt={`Screenshot of ${project.name}`}
+          width={960}
+          height={600}
+          loading="lazy"
+          decoding="async"
+          className="aspect-[16/10] w-full object-cover object-top transition-transform duration-500 group-hover:scale-[1.03]"
+        />
+      </a>
+      <div className="mt-5 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+        <h3 className="font-display text-3xl font-semibold leading-tight">{project.name}</h3>
+        <p className="flex items-center gap-2 text-[0.95rem] text-muted">
+          <span aria-hidden="true" className="size-2 rounded-full bg-live" />
+          {project.status}
+        </p>
+      </div>
+      <p className="mt-2 max-w-[52ch] text-muted">{project.line}</p>
+      <div className="mt-4 flex flex-wrap items-center gap-2">
+        <a href={project.live} target="_blank" rel="noreferrer" className="btn btn-primary">
+          Open live site<span className="sr-only">: {project.name}</span>
+          <ArrowUpRight size={17} strokeWidth={2} aria-hidden="true" />
+        </a>
+        {project.repo && (
+          <a href={project.repo} target="_blank" rel="noreferrer" className="btn btn-ghost">
+            <Code size={17} strokeWidth={2} aria-hidden="true" />
+            Code<span className="sr-only"> for {project.name}</span>
+          </a>
+        )}
+        <span className="ml-1 rounded-full border border-line px-3 py-1 text-[0.9rem] text-muted">
+          {project.category}
+        </span>
+      </div>
+    </article>
   )
 }
 
-function Field({ label, children }: { label: string; children: ReactNode }) {
-  return (
-    <div className="border-t border-rule py-4 md:px-5 md:odd:pl-0 md:even:border-l md:even:pr-0">
-      <dt className="font-display text-lg font-semibold leading-tight">{label}</dt>
-      <dd className="mt-1 max-w-[58ch] text-[0.975rem]">{children}</dd>
-    </div>
-  )
-}
+// Phone reading order for each card: heading first, then projects in their listed order.
+const phoneOrder = ['order-1', 'order-2', 'order-3', 'order-4', 'order-5', 'order-6', 'order-7', 'order-8']
 
 export function Projects() {
+  // Wide screens: two staggered columns, with the heading at the top of the right one.
+  // Phones: the same elements in one column (the column wrappers dissolve), ordered by phoneOrder.
+  const columns = [0, 1].map((side) => projects.map((project, i) => ({ project, i })).filter(({ i }) => i % 2 === side))
+
   return (
-    <Section
-      id="projects"
-      title="Projects"
-      aside="Three systems I architected for clients, then four things I built on my own. Every project has its link at the top."
-    >
-      <div className="grid gap-14">
-        {caseStudies.map((study) => (
-          <article key={study.id} aria-labelledby={`project-${study.id}`} className="border-t-2 border-ink">
-            <header className="flex flex-wrap items-center justify-between gap-x-6 gap-y-3 py-4">
-              <div>
-                <h3 id={`project-${study.id}`} className="font-display text-[1.75rem] font-semibold leading-tight">
-                  {study.name}
-                </h3>
-                <p className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[0.95rem] text-pencil">
-                  <span>
-                    {study.category}, {study.period}
-                  </span>
-                  <span className="text-ink">
-                    <Status status={study.status} />
-                  </span>
+    <section id="projects" aria-labelledby="projects-title" className="px-5 py-16 sm:px-8 md:py-24">
+      <div className="mx-auto flex max-w-[1200px] flex-col gap-14 md:grid md:grid-cols-2 md:gap-x-10 md:gap-y-0 lg:gap-x-16">
+        {columns.map((column, side) => (
+          <div key={side} className={`contents md:grid md:content-start md:gap-20 ${side === 1 ? 'md:pt-6' : ''}`}>
+            {side === 1 && (
+              <div className="order-first md:order-none">
+                <h2
+                  id="projects-title"
+                  className="font-display text-[clamp(2.5rem,6vw,4.25rem)] font-bold leading-[0.95] tracking-[-0.01em]"
+                >
+                  Things I have built
+                </h2>
+                <p className="mt-4 max-w-[38ch] text-lg text-muted">
+                  Six products you can open and use right now. Each one has its live site and, where it is public, its
+                  code.
                 </p>
               </div>
-              <a href={study.diagram} className={primary}>
-                <Workflow size={17} strokeWidth={1.75} aria-hidden="true" />
-                View system diagram<span className="sr-only"> for {study.name}</span>
-              </a>
-            </header>
-            <dl className="grid border-b border-rule md:grid-cols-2">
-              <Field label="Problem">{study.problem}</Field>
-              <Field label="System designed">{study.system}</Field>
-              <Field label="Architecture and decisions">
-                <ul className="grid gap-1.5">
-                  {study.decisions.map((decision) => (
-                    <li key={decision} className="flex gap-2.5">
-                      <span aria-hidden="true" className="mt-[0.7em] h-px w-3 shrink-0 bg-ink" />
-                      <span>{decision}</span>
-                    </li>
-                  ))}
-                </ul>
-              </Field>
-              <Field label="Outcome">{study.outcome}</Field>
-            </dl>
-          </article>
-        ))}
-
-        <div>
-          <h3 className="font-display text-[1.75rem] font-semibold leading-tight">Side builds</h3>
-          <p className="mb-4 max-w-[60ch] text-[0.95rem] text-pencil">
-            Built outside client work. Each one has a live demo; none is presented as a production system.
-          </p>
-          <ul className="border-t-2 border-ink">
-            {sideBuilds.map((build) => (
-              <li
-                key={build.name}
-                className="flex flex-wrap items-center justify-between gap-x-8 gap-y-3 border-b border-rule py-4"
-              >
-                <div className="min-w-0 flex-1 basis-72">
-                  <h4 className="flex flex-wrap items-baseline gap-x-4 gap-y-1">
-                    <span className="font-display text-xl font-semibold leading-tight">{build.name}</span>
-                    <Status status={build.status} />
-                  </h4>
-                  <p className="max-w-[56ch]">{build.line}</p>
-                  <p className="text-[0.95rem] text-pencil">
-                    {[build.category, build.stack].filter(Boolean).join('. Built with ')}
-                  </p>
-                </div>
-                <p className="flex flex-wrap gap-2">
-                  <a href={build.demo} target="_blank" rel="noreferrer" className={primary}>
-                    Live demo<span className="sr-only"> of {build.name}</span>
-                    <ArrowUpRight size={17} strokeWidth={1.75} aria-hidden="true" />
-                  </a>
-                  {build.repo && (
-                    <a href={build.repo} target="_blank" rel="noreferrer" className={secondary}>
-                      <Code size={17} strokeWidth={1.75} aria-hidden="true" />
-                      Code<span className="sr-only"> for {build.name}</span>
-                    </a>
-                  )}
-                </p>
-              </li>
+            )}
+            {column.map(({ project, i }) => (
+              <div key={project.name} className={`${phoneOrder[i]} md:order-none`}>
+                <ProjectCard project={project} />
+              </div>
             ))}
-          </ul>
-        </div>
+          </div>
+        ))}
       </div>
-    </Section>
+    </section>
   )
 }

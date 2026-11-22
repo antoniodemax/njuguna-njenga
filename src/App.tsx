@@ -1,11 +1,12 @@
 import { LazyMotion } from 'motion/react'
 import { About } from './components/About'
+import { ClientWork } from './components/ClientWork'
+import { GitHubProfiles } from './components/GitHubProfiles'
 import { Hero } from './components/Hero'
+import { Projects } from './components/Projects'
 import { RecordTable } from './components/RecordTable'
 import { SheetHeader } from './components/SheetHeader'
-import { Certifications, SkillsLegend } from './components/SkillsLegend'
-import { Architecture } from './components/Architecture'
-import { Projects } from './components/Projects'
+import { SkillsAndCertifications } from './components/SkillsLegend'
 import { TitleBlock } from './components/TitleBlock'
 
 // The animation engine loads separately, after the page is already readable.
@@ -14,22 +15,17 @@ const loadMotion = () => import('./motion-features').then((mod) => mod.default)
 function App() {
   return (
     <LazyMotion features={loadMotion} strict>
-    <div className="mx-auto max-w-[1280px] p-2 sm:p-5">
-      {/* The sheet: a single framed drawing */}
-      <div className="border border-ink bg-sheet">
-        <SheetHeader />
-        <main>
-          <Hero />
-          <About />
-          <Projects />
-          <Architecture />
-          <RecordTable />
-          <SkillsLegend />
-          <Certifications />
-        </main>
-        <TitleBlock />
-      </div>
-    </div>
+      <SheetHeader />
+      <main>
+        <Hero />
+        <About />
+        <Projects />
+        <ClientWork />
+        <RecordTable />
+        <SkillsAndCertifications />
+        <GitHubProfiles />
+      </main>
+      <TitleBlock />
     </LazyMotion>
   )
 }

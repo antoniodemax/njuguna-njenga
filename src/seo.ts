@@ -22,7 +22,7 @@ export function profileJsonLd() {
       telephone: profile.phone.replace(/\s/g, ''),
       address: { '@type': 'PostalAddress', addressLocality: 'Nairobi', addressCountry: 'KE' },
       alumniOf: { '@type': 'CollegeOrUniversity', name: education.school },
-      sameAs: [profile.linkedin, profile.github],
+      sameAs: [profile.linkedin, ...profile.githubProfiles.map((p) => p.url)],
       knowsAbout: [
         'Artificial intelligence',
         'Agentic AI',

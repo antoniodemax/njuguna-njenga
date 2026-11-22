@@ -25,9 +25,9 @@ if (!cssLink) throw new Error('Could not find the stylesheet link in dist/index.
 const css = await readFile(path.join(dist, cssLink[1]), 'utf8')
 html = html.replace(cssLink[0], () => `<style>${css}</style>`)
 
-// Preload the two fonts used above the fold so the headline does not reflow when they arrive.
+// Preload the three fonts used above the fold so the headline does not reflow when they arrive.
 const assets = await readdir(path.join(dist, 'assets'))
-const preloads = ['barlow-condensed-latin-700-normal', 'barlow-latin-400-normal']
+const preloads = ['barlow-condensed-latin-700-normal', 'barlow-condensed-latin-600-normal', 'barlow-latin-400-normal']
   .map((name) => assets.find((file) => file.startsWith(name) && file.endsWith('.woff2')))
   .filter(Boolean)
   .map((file) => `<link rel="preload" href="/assets/${file}" as="font" type="font/woff2" crossorigin />`)
